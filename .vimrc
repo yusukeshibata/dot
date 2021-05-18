@@ -1,20 +1,20 @@
-set nocompatible
+filetype off
+syntax on
 
-set backspace=start,eol,indent
+"
+set termguicolors
+set background=dark
+set nocompatible
 set whichwrap=b,s,[,],,~
 set incsearch
 set wildmenu wildmode=list:full
-syntax on
 set hlsearch
-set cursorline
 set modeline
 set shiftwidth=2
 set number
 set laststatus=2
 set t_Co=256
 set runtimepath+=~/.vim/
-runtime! userautoload/*.vim
-
 set scrolloff=5
 set noswapfile
 set nowritebackup
@@ -30,103 +30,114 @@ set smarttab
 set tabstop=2
 set shiftwidth=2
 set softtabstop=2
-set noexpandtab
+set expandtab
 set backspace=indent,eol,start
 set clipboard=unnamed
-let loaded_matchparen = 1 
-colorscheme delek
-highlight SpecialKey ctermfg=Black
-highlight CursorLine none
-highlight CursorLineNr ctermfg=Black ctermbg=Brown
-" leader
-let mapleader = ","
+set ttimeout
+set ttimeoutlen=0
+"set listchars=tab:▹␣
+set list
+set lazyredraw          " Wait to redraw
+set scrolljump=8        " Scroll 8 lines at a time at bottom/top
+set noshowmatch         " Don't match parentheses/brackets
+set nocursorline        " Don't paint cursor line
+set nocursorcolumn      " Don't paint cursor column
+set exrc
+set secure
+set autoread
+set diffopt+=vertical
+set guifont=Menlo-Regular:h14
+set mouse=a
+set undodir=~/.undo
+" set undofile
+
+"
+runtime! userautoload/*.vim
+autocmd BufEnter * set mouse=
 noremap <leader><TAB> :bnext<CR>
 noremap <leader><S-TAB> :bprev<CR>
 nnoremap <ESC><ESC> :noh<CR>
 
-let iCanHazVundle=1
-let vundle_readme=expand('~/.vim/bundle/Vundle.vim/README.md')
-if !filereadable(vundle_readme)
-  echo "Installing Vundle.."
-  echo ""
-  silent !mkdir -p ~/.vim/bundle
-  silent !git clone https://github.com/gmarik/Vundle.vim ~/.vim/bundle/Vundle.vim
-  let iCanHazVundle=0
-endif
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'gmarik/Vundle.vim'
-" Plugin 'scrooloose/syntastic'
-Plugin 'itchyny/lightline.vim'
-Plugin 'kana/vim-fakeclip'
-Plugin 'Shougo/unite.vim'
-Plugin 'ujihisa/unite-colorscheme'
-Plugin 'tpope/vim-obsession'
-Plugin 'vim-scripts/renamer.vim'
-Plugin 'othree/eregex.vim'
-if has('lua')
-  Plugin 'Shougo/neocomplete.vim'
-end
-
-" filetypes
-Plugin 'groenewege/vim-less'
-Plugin 'pangloss/vim-javascript'
-Plugin 'rcmdnk/vim-markdown'
-Plugin 'digitaltoad/vim-jade'
-Plugin 'elzr/vim-json'
-call vundle#end()
-filetype plugin indent on
-
-if iCanHazVundle == 0
-  :BundleInstall
-endif
-" neocomplete
-let g:acp_enableAtStartup = 0
-let g:neocomplete#enable_at_startup = 1
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-
-" filetype
-au BufNewFile,BufRead *.html            set filetype=html
-au BufNewFile,BufRead *.less            set filetype=less
-au BufNewFile,BufRead *.json            set filetype=json
-au BufNewFile,BufRead *.as              set filetype=javascript
-au BufNewFile,BufRead *.jade            set filetype=jade
-au BufNewFile,BufRead *.md              set filetype=markdown
-
-" buftabs
-let g:buftabs_only_basename=1
-let g:buftabs_in_statusline=1
-let g:buftabs_active_highlight_group="Visual"
-set statusline=%=\ [%{(&fenc!=''?&fenc:&enc)}/%{&ff}]\[%Y]\[%04l,%04v][%p%%]
-set laststatus=2
-
-" syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_loc_list_height = 3
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_javascript_eslint_generic = 1
-let g:syntastic_javascript_eslint_exec = 'xo'
-let g:syntastic_javascript_eslint_args = '--compact'
-"let g:syntastic_javascript_checkers = ['eslint']
 "
+" Plugin
+"
+
+let g:coc_global_extensions = ['coc-tsserver', 'coc-prettier', 'coc-eslint']
+
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+
+" styling
+Plug 'itchyny/lightline.vim'
+" ;; toggle files
+Plug 'Shougo/unite.vim'
+" Subvert
+Plug 'tpope/vim-abolish'
+" regex
+Plug 'othree/eregex.vim'
+" gdiff
+Plug 'tpope/vim-fugitive'
+" editorconfig
+Plug 'editorconfig/editorconfig-vim'
+" git diff
+Plug 'airblade/vim-gitgutter'
+" typescript
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" nerdtree
+Plug 'scrooloose/nerdtree'
+" glsl
+" Plug 'tikhomirov/vim-glsl'
+" rust
+" Plug 'rust-lang/rust.vim'
+" Plug 'cespare/vim-toml'
+" fzf
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'airblade/vim-rooter'
+
+call plug#end()
+
+"
+" Plugin setting
+"
+
 " unite
 nnoremap <silent> ;; :<C-u>Unite buffer -direction=botright -auto-resize -toggle<CR>
-set list
-set listchars=tab:^\ ,trail:~
 
-" markdown
-let g:vim_markdown_folding_disabled=1
-" json
-let g:vim_json_syntax_conceal = 0
+" vim-jsx-typescript
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx
 
-" eregex
-nnoremap <leader>/ :call eregex#toggle()<CR> 
+" nerdtree
+map <C-a> :NERDTreeToggle %<CR>
+nmap <silent> <leader>a <Plug>(coc-diagnostic-next-error)
+nmap <silent> <leader>A <Plug>(coc-diagnostic-next)
+let NERDTreeQuitOnOpen=1
 
-"
-set diffopt+=vertical
+" glsl
+autocmd! BufNewFile,BufRead *.vs,*.fs set ft=glsl
+
+""" coc.nvim
+
+" Use tab for trigger completion with characters ahead and navigate.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+nnoremap <C-p> :FZF<Cr>
+
+" color
+hi LineNr guifg=gray
+hi Comment guifg=gray
+hi Todo cterm=bold ctermfg=5 guifg=Blue guibg=Red
+hi CocWarningFloat guibg=Orange guifg=#fff
+hi CocErrorFloat guibg=Red guifg=#fff
+hi IncSearch guibg=White guifg=Red
